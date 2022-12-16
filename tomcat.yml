@@ -9,4 +9,30 @@
     - name: Install default jdk
       ansible.builtin.apt:
         name: default-jdk
+        update_cache: yes
         state: present
+    - name: Ensure group "somegroup" exists
+      ansible.builtin.group:
+        name: tomcat
+        state: present
+    - name: create a user tomcat 
+      user:
+        name: tomcat 
+        state: present 
+        group: tomcat 
+    - name: create a tomcat directory 
+      file:
+        path: /usr/share/tomcat 
+        state: directory 
+        owner: tomcat 
+        group: tomcat 
+    
+
+
+
+
+
+
+
+
+      
