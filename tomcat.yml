@@ -1,0 +1,6 @@
+---
+- #list of items in python
+  hosts: all 
+
+  tasks:
+    - name: update my ubuntu system 
