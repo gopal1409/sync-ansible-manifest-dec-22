@@ -1,63 +1,59 @@
----
-- #list of items in python
-  hosts: all 
+--
+-
+  hosts: all    
   vars:
-    tomcat_download_url = https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.70/bin/apache-tomcat-9.0.70.tar.gz
-    tomcat_download_location = /usr/share/tomcat/apache-tomcat-9.0.70
+    tomcat_download_url: https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.69/bin/apache-tomcat-9.0.69.tar.gz
+    tomcat_download_location: /usr/share/tomcat/apache-tomcat-9.0.69
   tasks:
-    - name: update my ubuntu system 
-      ansible.builtin.apt:
-        update_cache: yes
-    - name: Install default jdk
-      ansible.builtin.apt:
-        name: default-jdk
-        update_cache: yes
-        state: present
-    - name: Ensure group "tomcatgroup" exists
-      ansible.builtin.group:
-        name: tomcat
-        state: present
-    - name: create a user tomcat 
-      user:
-        name: tomcat 
-        state: present 
-        group: tomcat 
-    - name: create a tomcat directory 
-      file:
-        path: /usr/share/tomcat 
-        state: directory 
-        owner: tomcat 
-        group: tomcat 
-    - name: download tomcat 
-      get_url:
-        src:  "{{tomcat_download_url}}"
-        dest: "{{tomcat_download_location}}"
-    - name: extract tomcat 
-      unarchive:
-        src: "{{tomcat_download_location}}"
-        dest: /usr/share/tomcat 
-        owner: tomcat 
-        group: tomcat 
-        remote_src: yes 
-        extra_opts: [--strip-components=1]
-    - name: copy tomcat service 
-      template:
-        src: templates/tomcat.service.j2
-        dest: /etc/systemd/system/tomcat.service 
-      when: ansible_service_mgr == 'systemd'
-    - name: start and enable tomcat
-      service:
-        daemon_reload: yes 
-        name: tomcat 
-        state: strated
-        enabled: yes 
-      when: ansible_service_mgr == 'systemd'
-
-
-
-
-
-
-
+ 
+     
+      - name: install openjdk ubuntu
+        package:
+          name: default-jdk
+          update_cache: yes
+          state: present
+      - name: create a group tomcat
+        group:
+          name: tomcat
+          state: present
+      - name: create user tomcat
+        user:
+          name: tomcat
+          state: present
+          group: tomcat
+      - name: create a tomcat directory
+        file:
+          path: /usr/share/tomcat
+          state: directory
+          owner: tomcat
+          group: tomcat
+      - name: Download Tomcat
+        get_url:
+          url: "{{tomcat_download_url}}"
+          dest: "{{tomcat_download_location}}"
+      - name: extract tomcat
+        unarchive:
+          src: "{{tomcat_download_location}}"
+          dest: /usr/share/tomcat
+          owner: tomcat
+          group: tomcat
+          remote_src: yes
+          extra_opts: [--strip-components=1]
+          creates: /usr/share/tomcat/bin
+      - name: copy tomcat service
+        template:
+          src: templates/tomcat.service.j2
+          dest: /etc/systemd/system/tomcat.service
+        when: ansible_service_mgr == 'systemd'
+      - name: start and enable tomcat
+        service:
+          daemon_reload: yes
+          name: tomcat
+          state: started
+          enabled: yes
+        when: ansible_service_mgr == 'systemd'
+     
+      #there are different type of firewall in different os. redhat firewalld ufw
+      ##3if you look into the task by default where it will execute
 
       
